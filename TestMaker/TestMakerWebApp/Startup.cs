@@ -40,6 +40,10 @@ namespace TestMakerWebApp
             }
 
             app.UseHttpsRedirection();
+            
+            // This line will call the Static files middleware to
+            // let me use the static file stored on web root folder
+            // such as CSS, JS and Images
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
 
