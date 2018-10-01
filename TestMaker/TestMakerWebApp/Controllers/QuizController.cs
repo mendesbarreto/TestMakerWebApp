@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using TestMakerWebApp.ViewModels;
 
 namespace TestMakerWebApp.Controllers
@@ -14,12 +15,15 @@ namespace TestMakerWebApp.Controllers
         [HttpGet("latest/{numberOfElements}")]
         public IActionResult Latest(int numberOfElements = 10)
         {
-            return new JsonResult(
-                CreateMockQuizViewModels(numberOfElements), 
-                new JsonSerializerSettings()
-                {
-                    Formatting = Formatting.Indented
-                });
+            var sampleQuizzesViewModels = CreateMockQuizViewModels(numberOfElements);
+            return CreateJsonResult(sampleQuizzesViewModels);
+//            
+//            return new JsonResult(
+//                CreateMockQuizViewModels(numberOfElements), 
+//                new JsonSerializerSettings()
+//                {
+//                    Formatting = Formatting.Indented
+//                });
         }
         
         /// <summary>
@@ -31,13 +35,14 @@ namespace TestMakerWebApp.Controllers
         [HttpGet("byTitle/{numberOfElements:int?}")]
         public IActionResult ByTitle(int numberOfElements = 10)
         {
-            var sampleQuizzesViewModels = CreateMockQuizViewModels(numberOfElements); 
-            return new JsonResult(
-                sampleQuizzesViewModels.OrderBy(t => t.Title), 
-                new JsonSerializerSettings()
-                {
-                    Formatting = Formatting.Indented
-                });
+            var sampleQuizzesViewModels = CreateMockQuizViewModels(numberOfElements);
+            return CreateJsonResult(sampleQuizzesViewModels.OrderBy(t => t.Title));
+//            return new JsonResult(
+//                , 
+//                new JsonSerializerSettings()
+//                {
+//                    Formatting = Formatting.Indented
+//                });
         }
 
         /// <summary>
@@ -50,21 +55,32 @@ namespace TestMakerWebApp.Controllers
         public IActionResult Random(int numberOfElements = 10)
         {
             var sampleQuizzes = CreateMockQuizViewModels(numberOfElements);
-            
-            return new JsonResult(
-                sampleQuizzes.OrderBy(t => Guid.NewGuid()),
-                new JsonSerializerSettings()
-                {
-                    Formatting = Formatting.Indented
-                });
+            return CreateJsonResult(sampleQuizzes.OrderBy(t => Guid.NewGuid()));
+//            return new JsonResult(
+//                sampleQuizzes.OrderBy(t => Guid.NewGuid()),
+//                new JsonSerializerSettings()
+//                {
+//                    ContractResolver = new CamelCasePropertyNamesContractResolver(),
+//                    Formatting = Formatting.Indented
+//                });
         }
-        
         
         public QuizController()
         {
             
         }
 
+        private JsonResult CreateJsonResult(object value)
+        {
+            return new JsonResult(
+                value,
+                new JsonSerializerSettings()
+                {
+                    ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                    Formatting = Formatting.Indented
+                });
+        }
+        
         private List<QuizViewModel> CreateMockQuizViewModels(int numberOfQuizzes)
         {
             var sampleQuizzes = new List<QuizViewModel>();
